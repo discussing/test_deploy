@@ -1,9 +1,9 @@
 # 镜像来源
-FROM registry.cn-hangzhou.aliyuncs.com/sunbl/sunbl_basic
+FROM registry.cn-hangzhou.aliyuncs.com/sunbl/sunbl_basic/alpine:CST
 
 # 拷贝当前目录的应用到镜像
-COPY cmd/PROJECT_NAME /application/
-COPY configs/app.yaml /application/configs/
+COPY PROJECT_NAME /application/
+#COPY configs/app.yaml /application/configs/
 
 # 声明工作目录,不然找不到依赖包，如果有的话
 WORKDIR /application
@@ -22,4 +22,4 @@ VOLUME /application/log
 # 启动命令
 # 设置时区
 # ENTRYPOINT ["java","-Duser.timezone=Asia/Shanghai","-Djava.security.egd=file:/dev/./urandom"]
-CMD ["/application/PROJECT_NAME","-config","/application/configs/app.yaml","-appid","PROJECT_NAME","-log.dir","/application/log","-deploy.env","SPRING_ENV"]
+CMD ["/application/PROJECT_NAME"]
