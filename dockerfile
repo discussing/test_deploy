@@ -1,7 +1,5 @@
 # 镜像来源
-FROM billionbottle-docker-registry-registry.cn-shenzhen.cr.aliyuncs.com/billion_basic/alpine:CST
-registry.cn-hangzhou.aliyuncs.com/sunbl/sunbl_basic
-
+FROM registry.cn-hangzhou.aliyuncs.com/sunbl/sunbl_basic
 
 # 拷贝当前目录的应用到镜像
 COPY cmd/PROJECT_NAME /application/
