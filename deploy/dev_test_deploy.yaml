@@ -1,0 +1,93 @@
+# ------------------- PersistentVolume ------------------- #
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-test-deploy
+  namespace: dev
+  labels:
+    name: pv-test-deploy
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+#  nfs:
+#    path: /home/billionbottle/go/log/dev/bottle-sec-kill
+#    server: 192.168.8.52
+
+---
+# ------------------- PersistentVolumeClaim ------------------- #
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-test-deploy
+  namespace: dev
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: test-deploy
+  name: test-deploy
+  namespace: dev
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: test-deploy
+  template:
+    metadata:
+      labels:
+        k8s-app: test-deploy
+    spec:
+      serviceAccountName: default
+      imagePullSecrets:
+        - name: registrykey-k8s
+      containers:
+        - name: test-deploy
+          image: $IMAGE_NAME
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8332
+              protocol: TCP
+          volumeMounts:
+            - name: pv-test-deploy
+              mountPath: "/application/log"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: pv-test-deploy
+          persistentVolumeClaim:
+            claimName: pvc-test-deploy
+
+---
+# ------------------- Dashboard Service ------------------- #
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: test-deploy
+  name: test-deploy
+  namespace: dev
+spec:
+  ports:
+    - port: 8332
+      targetPort: 8332
+      nodePort: 8000
+  type: NodePort
+  selector:
+    k8s-app: test-deploy

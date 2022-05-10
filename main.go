@@ -1,4 +1,4 @@
-package test_deploy
+package main
 
 import (
 	"github.com/gin-gonic/gin"
